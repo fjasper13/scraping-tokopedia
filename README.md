@@ -13,6 +13,4 @@ Colly Documentation : http://go-colly.org/docs/
 3. go run scraper.go
 
 ### Note:
-Please read https://support.goteamup.com/en/articles2977753-faq-when-opening-csv-file-all-data-appears-in-one-column to open the csv file
-
-
+Please read https://support.goteamup.com/en/articles2977753-faq-when-opening-csv-file-all-data-appears-in-one-column to open csv file properly

@@ -1,2 +1,17 @@
-# scraping-tokopedia
-Scraping tokopedia website using golang
+### Scraping Tokopedia Website
+
+# I'm Using Golang and Colly Library
+
+Golang Documentation : https://go.dev/doc/
+Colly Documentation : http://go-colly.org/docs/
+
+## How To Run The Code
+
+1. Install Golang -> https://go.dev/doc/install
+2. Import Colly Library -> go get -u github.com/gocolly/colly/...
+3. go run scraper.go
+
+# Note:
+Please read https://support.goteamup.com/en/articles 2977753-faq-when-opening-csv-file-all-data-appears-in-one-column to open the csv file
+
+

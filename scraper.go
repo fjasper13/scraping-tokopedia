@@ -14,6 +14,8 @@ func check(err error) {
 	}
 }
 
+var test string
+
 func main() {
 	// MAKE CSV FILE
 	file, err := os.Create("product.csv")
@@ -28,6 +30,7 @@ func main() {
 	writer.Write(header)
 
 	c := colly.NewCollector()
+	detailProduct := c.Clone()
 
 	c.OnRequest(func(r *colly.Request) {
 		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0")
@@ -44,8 +47,9 @@ func main() {
 		rating := e.ChildText(".css-153qjw7 span")
 		merchantName := e.ChildText(".css-vbihp9 span")
 
-		fmt.Println("imageLink")
-		fmt.Println(imageLink)
+		productLink := e.ChildAttr("div.e1nlzfl3 > a", "href")
+		productLink = e.Request.AbsoluteURL(productLink)
+		detailProduct.Visit(productLink)
 
 		//write information to csv file
 		writer.Write([]string{
@@ -64,12 +68,31 @@ func main() {
 		fmt.Println("Error :", e)
 	})
 
+	detailProduct.OnRequest(func(r *colly.Request) {
+		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0")
+		r.Headers.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+		fmt.Println("Visiting : ", r.URL)
+	})
+
+	detailProduct.OnError(func(r *colly.Response, e error) {
+		fmt.Println("Error To Get Detail Product")
+		fmt.Println("Status :", r.StatusCode)
+		fmt.Println("Error :", e)
+	})
+
+	detailProduct.OnHTML("div.css-41d95w", func(h *colly.HTMLElement) {
+		test = h.ChildText(".css-xi606m")
+		// test = h.ChildText(".css-xi606m h5")
+		fmt.Println("test")
+		fmt.Println(test)
+	})
+
 	// scrapping page 10 times (get a 100 handphone)
 	// for i := 1; i < 11; i++ {
 	// 	fmt.Printf("Scrapping Page : %d\n", i)
 
 	// 	c.Visit("https://www.tokopedia.com/p/handphone-tablet/handphone?ob=5&page=" + strconv.Itoa(i))
 	// }
-	c.Visit("https://www.tokopedia.com/p/handphone-tablet/handphone?ob=5&page=3")
+	c.Visit("https://www.tokopedia.com/p/handphone-tablet/handphone?ob=5&page=1")
 
 }

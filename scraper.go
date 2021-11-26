@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/gocolly/colly"
 )
@@ -13,8 +14,6 @@ func check(err error) {
 		fmt.Println(err)
 	}
 }
-
-var test string
 
 func main() {
 	// MAKE CSV FILE
@@ -30,26 +29,39 @@ func main() {
 	writer.Write(header)
 
 	c := colly.NewCollector()
-	detailProduct := c.Clone()
 
 	c.OnRequest(func(r *colly.Request) {
 		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0")
 		fmt.Println("Visiting : ", r.URL)
 	})
 
+	// counter for items
+	counter := 0
+	// counter to get merchant name
+	counter2 := 1
+
 	// return html element
 	c.OnHTML(".e1nlzfl3", func(e *colly.HTMLElement) {
 		// locate all information
 		productName := e.ChildText(".css-1bjwylw")
 		description := e.ChildText(".css-wfq7u")
-		imageLink := e.ChildText(".css-79elbk img")
+		imageLink := e.ChildText(".css-16vw0vn > img")
 		price := e.ChildText(".css-o5uqvq")
-		rating := e.ChildText(".css-153qjw7 span")
-		merchantName := e.ChildText(".css-vbihp9 span")
 
-		productLink := e.ChildAttr("div.e1nlzfl3 > a", "href")
-		productLink = e.Request.AbsoluteURL(productLink)
-		detailProduct.Visit(productLink)
+		// count the star
+		var rating int
+		e.ForEach(".css-177n1u3", func(index int, j *colly.HTMLElement) {
+			rating++
+		})
+
+		// get merchant name only without merchant location
+		var merchantName string
+		e.ForEach(".css-vbihp9 > .css-1kr22w3", func(index int, k *colly.HTMLElement) {
+			if counter2%2 == 0 {
+				merchantName = k.Text
+			}
+			counter2++
+		})
 
 		//write information to csv file
 		writer.Write([]string{
@@ -57,9 +69,10 @@ func main() {
 			description,
 			imageLink,
 			price,
-			rating,
+			strconv.Itoa(rating),
 			merchantName,
 		})
+		counter++
 	})
 
 	//handle error on request
@@ -68,31 +81,12 @@ func main() {
 		fmt.Println("Error :", e)
 	})
 
-	detailProduct.OnRequest(func(r *colly.Request) {
-		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0")
-		r.Headers.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-		fmt.Println("Visiting : ", r.URL)
-	})
+	// loop to scrap 100 items
+	for i := 1; counter < 100; i++ {
+		fmt.Printf("Scrapping Page : %d\n", i)
 
-	detailProduct.OnError(func(r *colly.Response, e error) {
-		fmt.Println("Error To Get Detail Product")
-		fmt.Println("Status :", r.StatusCode)
-		fmt.Println("Error :", e)
-	})
-
-	detailProduct.OnHTML("div.css-41d95w", func(h *colly.HTMLElement) {
-		test = h.ChildText(".css-xi606m")
-		// test = h.ChildText(".css-xi606m h5")
-		fmt.Println("test")
-		fmt.Println(test)
-	})
-
-	// scrapping page 10 times (get a 100 handphone)
-	// for i := 1; i < 11; i++ {
-	// 	fmt.Printf("Scrapping Page : %d\n", i)
-
-	// 	c.Visit("https://www.tokopedia.com/p/handphone-tablet/handphone?ob=5&page=" + strconv.Itoa(i))
-	// }
-	c.Visit("https://www.tokopedia.com/p/handphone-tablet/handphone?ob=5&page=1")
+		c.Visit("https://www.tokopedia.com/p/handphone-tablet/handphone?ob=5&page=" + strconv.Itoa(i))
+	}
+	// c.Visit("https://www.tokopedia.com/p/handphone-tablet/handphone?ob=5&page=1")
 
 }

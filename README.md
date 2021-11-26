@@ -13,4 +13,4 @@ Colly Documentation : http://go-colly.org/docs/
 3. Using Command Line -> go run scraper.go / Make Exe File -> go build scraper.go 
 
 ### Note:
-Please read https://support.goteamup.com/en/articles2977753-faq-when-opening-csv-file-all-data-appears-in-one-column to open csv file properly
+Please read https://support.goteamup.com/en/articles/2977753-faq-when-opening-csv-file-all-data-appears-in-one-column to open csv file properly

@@ -45,7 +45,7 @@ func main() {
 		// locate all information
 		productName := e.ChildText(".css-1bjwylw")
 		description := e.ChildText(".css-wfq7u")
-		imageLink := e.ChildText(".css-16vw0vn > img")
+		imageLink := e.ChildAttr("img", "src")
 		price := e.ChildText(".css-o5uqvq")
 
 		// count the star
@@ -87,6 +87,8 @@ func main() {
 
 		c.Visit("https://www.tokopedia.com/p/handphone-tablet/handphone?ob=5&page=" + strconv.Itoa(i))
 	}
+
+	// for 1 page only
 	// c.Visit("https://www.tokopedia.com/p/handphone-tablet/handphone?ob=5&page=1")
 
 }

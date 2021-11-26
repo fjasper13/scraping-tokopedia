@@ -45,7 +45,7 @@ func main() {
 		// locate all information
 		productName := e.ChildText(".css-1bjwylw")
 		description := e.ChildText(".css-wfq7u")
-		imageLink := e.ChildAttr("img", "src")
+		imageLink := e.ChildAttr("img", "src") // base64 because generated from html
 		price := e.ChildText(".css-o5uqvq")
 
 		// count the star
